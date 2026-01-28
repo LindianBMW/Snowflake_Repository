@@ -1,0 +1,15 @@
+
+[connections.bigmotoringworld_snowflake]
+accountname = ltjspif-tt74155
+username = LINDIAN.THOMAS
+warehouse = COMPUTE_WH
+database = RAW
+schema = CRM
+authenticator = SNOWFLAKE_JWT
+private_key_path = C:\\Users\\lindian.thomas\\\Documents\rsa_key_snowflake.pem
+
+
+
+
+snowsql -c bigmotoringworld_snowflake -q "PUT file://C:/Users/lindian.thomas/Documents/CRM/InfinityDownloads/*.csv @RAW.CRM.INFINITY auto_compress=false;"
+ 
