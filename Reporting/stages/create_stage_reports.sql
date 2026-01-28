@@ -1,0 +1,1 @@
+CREATE OR REPLACE STAGE reporting.details.REPORTS;

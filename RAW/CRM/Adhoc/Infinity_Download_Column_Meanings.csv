@@ -1,0 +1,100 @@
+Column Name,Meaning / Description
+rowId,Unique identifier for each record/row
+triggerDatetime,Date and time the event was triggered
+igrp,Inbound group or call group identifier
+dgrp,Destination group identifier
+ch,Channel (e.g., web, phone, chat)
+src,Source (e.g., campaign, referrer, or traffic source)
+act,Action taken (e.g., call, click, visit)
+algo,Algorithm used (e.g., for routing or attribution)
+attr,Attribution model or attribute
+vref,Visitor reference or ID
+href,Hyperlink reference (URL)
+num,Number dialed or associated with the event (phone number)
+term,Search term or keyword
+vid,Visitor ID
+t,Type or timestamp
+goal,Goal achieved (e.g., conversion, call)
+srcHash,Hashed source value
+new,New visitor/session flag
+pageTitle,Title of the web page
+pub,Publisher or publication source
+segment,Segment or audience group
+segmentGroupId,ID for a group of segments
+dom,Domain
+ref,Referrer
+network,Network (e.g., ad network, telecom)
+matchRef,Match reference (e.g., for attribution)
+matchType,Type of match (e.g., exact, broad)
+campaign,Marketing campaign name or ID
+adGroup,Ad group name or ID
+adRef,Ad reference or ID
+keywordRef,Keyword reference or ID
+dialledPhoneNumber,The phone number dialed by the caller
+srcPhoneNumber,Source phone number (caller’s number)
+destPhoneNumber,Destination phone number (recipient’s number)
+callDuration,Duration of the call
+bridgeDuration,Duration the call was bridged/connected
+ringTime,Time spent ringing before answer
+ivrDuration,Time spent in IVR (Interactive Voice Response)
+queueDuration,Time spent in queue
+operatorRef,Operator reference or ID
+ivrRef,IVR reference or ID
+dialplanRef,Dial plan reference or ID
+callRating,Rating of the call (e.g., quality, satisfaction)
+callState,State of the call (e.g., completed, missed)
+callDirection,Direction of the call (inbound/outbound)
+callStage,Stage of the call (e.g., ringing, connected)
+operatorRealm,Operator’s realm or domain
+telcoCode,Telecom code or identifier
+numType,Type of number (e.g., mobile, landline)
+rec,Recording reference or flag
+transcriptionConfidence,Confidence score for call transcription
+totalKeywordScore,Total score for detected keywords
+totalOperatorKeywordScore,Score for operator-related keywords
+totalContactKeywordScore,Score for contact-related keywords
+operatorPositiveKeywordCount,Count of positive keywords for operator
+operatorNeutralKeywordCount,Count of neutral keywords for operator
+operatorNegativeKeywordCount,Count of negative keywords for operator
+contactPositiveKeywordCount,Count of positive keywords for contact
+contactNeutralKeywordCount,Count of neutral keywords for contact
+contactNegativeKeywordCount,Count of negative keywords for contact
+callPciDataChecked,Whether PCI data was checked
+callPciDataFound,Whether PCI data was found
+callSsnDataChecked,Whether SSN data was checked
+callSsnDataFound,Whether SSN data was found
+callPiiDataChecked,Whether PII data was checked
+callPiiDataFound,Whether PII data was found
+callKeywordSpotting,Keyword spotting result or flag
+callTranscription,Transcription of the call
+whois,Whois information (could be for IP/domain)
+ip,IP address
+ua,User agent string
+country,Country
+city,City
+continent,Continent
+res,Resolution or result
+lat,Latitude
+long,Longitude
+region,Region
+postcode,Postal code
+area,Area
+spider,Spider/bot flag
+host,Hostname
+visitorType,Type of visitor (e.g., new, returning)
+sfWhoRef,Salesforce or system reference
+visitorPageCount,Number of pages visited
+visitorGoalCount,Number of goals achieved by visitor
+visitorCallCount,Number of calls by visitor
+visitorFirstDatetime,First visit/call datetime
+landingPageId,ID of the landing page
+conversionPageId,ID of the conversion page
+chName,Channel name
+chType,Channel type
+segmentName,Name of the segment
+segmentRef,Reference for the segment
+orgId,Organization ID
+segmentGroupName,Name of the segment group
+notes,Notes or comments
+leadScore,Lead scoring value
+audit_insert_ts,Timestamp when the row was inserted (auto-generated)

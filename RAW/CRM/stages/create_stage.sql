@@ -1,0 +1,3 @@
+CREATE or REPLACE STAGE RAW.CRM.INFINITY;
+
+show users; 
