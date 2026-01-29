@@ -35,3 +35,8 @@ if exist "%DEST_DIR%\%CSV_FILE2%" (
 ) else (
     echo WARNING: File not found: %DEST_DIR%\%CSV_FILE2%
 )
+
+REM === STEP 5: Clear out the destination folder after upload ===
+echo Deleting all files from %DEST_DIR% ...
+del /q "%DEST_DIR%\*.*"
+echo Folder %DEST_DIR% cleared.

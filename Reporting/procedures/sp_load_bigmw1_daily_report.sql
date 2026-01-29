@@ -10,6 +10,7 @@ $$
 /*
   Loads bigmw1_daily report from stage @reporting.details.REPORTS into reporting.details.BIGMW1_DAILY_REPORT (raw VARCHAR).
   Enhanced for success/error messaging and notification. 
+  Before Merge
 */
 try {
     // Drop temp table if it exists
