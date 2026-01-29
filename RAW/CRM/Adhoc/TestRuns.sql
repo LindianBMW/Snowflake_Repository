@@ -114,3 +114,71 @@ select * from  reporting.details.CLAIMS_IMPORT limit 10;
 
 
 list @RAW.CRM.INFINITY;  
+
+
+/********************************************************************* */
+-- ================         Demo  Start ============================== --
+
+/********************************************************************* */
+
+--1. Truncate the destination table
+ truncate table reporting.details.BIGMW1_DAILY_REPORT;
+
+--2. select from destination table to confirm truncate
+ select * from reporting.details.BIGMW1_DAILY_REPORT;
+
+ --3. Check that the stage is empty
+ remove @RAW.CRM.INFINITY;
+ list  @RAW.CRM.INFINITY;
+
+ --3. Simulate Server side processing
+/*/
+    a. At a certain time in the day a connection wil be made to
+       the Infinity data source.
+    b. Then data will be extracted and placed into a staging area
+    All the above processing will be handled by this script which will be started on the server. 
+    We still have no access to a server, but it it done here for demo purposes.
+    In effect all we do on the server is call this script 
+    downloadInfinitydata.ps1  at a certain during the day
+
+    The Infinity data is stored as a .csv  in a local folder
+    mention 13 month back initial load , thereafet incremental 
+    
+    Then we use snowsql to PUT the data into the stage
+*/ 
+
+--4. Now look at stage to confirm data is there ..(Run it on the server) 
+ list  @RAW.CRM.INFINITY;
+
+ --5. Execute the schedule  - time will be set, but for demo, we will just run it
+
+ execute task RAW.CRM.task_load_infinity_download; 
+
+ select *   from RAW.CRM.INFINITY_DOWNLOAD
+
+/********************************************************************* */
+-- ================         Demo End ============================== --
+
+/********************************************************************* */
+
+
+
+
+
+use role ACCOUNTADMIN;
+
+truncate table RAW.CRM.INFINITY_DOWNLOAD;
+
+select * from RAW.CRM.INFINITY_DOWNLOAD limit 10;
+
+--  remove @RAW.CRM.INFINITY;
+
+list @RAW.CRM.INFINITY;
+
+--============================= TEST RUNS ============================--
+CALL RAW.CRM.sp_load_infinity_download();
+
+select *  from RAW.CRM.INFINITY_DOWNLOAD  limit 10; 
+
+DELETE FROM RAW.CRM.INFINITY_DOWNLOAD WHERE TRY_CAST(rowid AS NUMBER) IS NULL;
+select count(*)  from RAW.CRM.INFINITY_DOWNLOAD ;
