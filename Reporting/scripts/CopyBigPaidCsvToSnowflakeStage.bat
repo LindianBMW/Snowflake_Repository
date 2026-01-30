@@ -28,7 +28,6 @@ if exist "%DEST_DIR%\%CSV_FILE%" (
 
 REM === STEP 4: Upload the second CSV file to the stage ===
 
-REM === STEP 4: Upload the second CSV file to the stage ===
 set "CSV_FILE2=bigmw1_daily report.csv"
 
 if exist "%DEST_DIR%\%CSV_FILE2%" (
@@ -38,13 +37,21 @@ if exist "%DEST_DIR%\%CSV_FILE2%" (
     echo WARNING: File not found: %DEST_DIR%\%CSV_FILE2%
 )
 
+
 REM === STEP 5: Upload any Blackhorse Commission Data file with a date prefix ===
 for %%F in ("%DEST_DIR%\*Blackhorse Commission Data.csv") do (
     echo Uploading %%~nxF ...
     %SNOWSQL% -c %SNOW_CONN% -q "PUT 'file://C:/Temp/%%~nxF' %SNOW_STAGE% AUTO_COMPRESS=false"
 )
 
+REM === STEP 6: Upload any SALES REPORTS DETAILED-SALES BIG DASHBOARD CSV file(s) ===
+for %%F in ("%DEST_DIR%\sales reports detailed-sales  big dashboard - *.csv") do (
+    echo Uploading %%~nxF ...
+    echo %SNOWSQL% -c %SNOW_CONN% -q "PUT 'file://C:/Temp/%%~nxF' %SNOW_STAGE% AUTO_COMPRESS=false"
+    %SNOWSQL% -c %SNOW_CONN% -q "PUT 'file://C:/Temp/%%~nxF' %SNOW_STAGE% AUTO_COMPRESS=false"
+)
+
 REM === STEP 5: Clear out the destination folder after upload ===
-echo Deleting all files from %DEST_DIR% ...
-del /q "%DEST_DIR%\*.*"
-echo Folder %DEST_DIR% cleared.
+REM  echo Deleting all files from %DEST_DIR% ...
+REM  del /q "%DEST_DIR%\*.*"
+REM  echo Folder %DEST_DIR% cleared.

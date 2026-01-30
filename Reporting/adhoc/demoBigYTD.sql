@@ -45,6 +45,14 @@ DELETE FROM reporting.details.CLAIMS_IMPORT
 WHERE CLAIM_NO IN (
   SELECT CLAIM_NO
   FROM reporting.details.CLAIMS_IMPORT
+
+
   LIMIT 756
 );
 
+
+
+SHOW PROCEDURES LIKE 'SP_COPY_CLAIMS_BASIC';
+
+-- Then, to get the DDL for the specific procedure:
+SELECT GET_DDL('PROCEDURE', 'DATABASE.SCHEMA.SP_COPY_CLAIMS_BASIC()');
