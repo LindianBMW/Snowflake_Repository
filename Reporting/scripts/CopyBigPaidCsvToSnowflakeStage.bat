@@ -44,12 +44,22 @@ for %%F in ("%DEST_DIR%\*Blackhorse Commission Data.csv") do (
     %SNOWSQL% -c %SNOW_CONN% -q "PUT 'file://C:/Temp/%%~nxF' %SNOW_STAGE% AUTO_COMPRESS=false"
 )
 
-REM === STEP 6: Upload any SALES REPORTS DETAILED-SALES BIG DASHBOARD CSV file(s) ===
+
+REM === STEP 7: Upload any B.M.W Commission Statement Reconciliation CSV file(s) with any timestamp ===
+for %%F in ("%DEST_DIR%\b.m.w commission statement reconciliation *.csv") do (
+    echo Uploading %%~nxF ...
+    %SNOWSQL% -c %SNOW_CONN% -q "PUT 'file://C:/Temp/%%~nxF' %SNOW_STAGE% AUTO_COMPRESS=false"
+)
+
+REM === STEP 8: Upload any SALES REPORTS DETAILED-SALES BIG DASHBOARD CSV file(s) ===
 for %%F in ("%DEST_DIR%\sales reports detailed-sales  big dashboard - *.csv") do (
     echo Uploading %%~nxF ...
     echo %SNOWSQL% -c %SNOW_CONN% -q "PUT 'file://C:/Temp/%%~nxF' %SNOW_STAGE% AUTO_COMPRESS=false"
     %SNOWSQL% -c %SNOW_CONN% -q "PUT 'file://C:/Temp/%%~nxF' %SNOW_STAGE% AUTO_COMPRESS=false"
 )
+
+
+
 
 REM === STEP 5: Clear out the destination folder after upload ===
 REM  echo Deleting all files from %DEST_DIR% ...
