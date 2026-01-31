@@ -27,3 +27,10 @@ SELECT * FROM reporting.details.SALES_REPORTS_DETAILED_SALES;
 
 -- 7. Optionally, run the procedure again to confirm idempotency (should report no new/updated rows)
 CALL reporting.details.sp_sales_reports_detailed_sales();
+
+show procedures like 'sp_%' in schema reporting.details;
+
+DROP PROCEDURE SP_SALES_REPORTS_DETAIED_SALES();
+
+
+select * from reporting.details.BLACKHORSE_COMMISSION_DATA;  

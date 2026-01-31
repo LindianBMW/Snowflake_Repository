@@ -11,6 +11,8 @@ SELECT COUNT(*) AS before_count FROM reporting.details.BMW_COMMISSION_RECONCILIA
 -- 2. Call the stored procedure
 CALL reporting.details.sp_load_bmw_commission_reconciliation();
 
+select *  from reporting.details.BMW_COMMISSION_RECONCILIATION;
+
 -- 3. Check row count after load
 SELECT COUNT(*) AS after_count FROM reporting.details.BMW_COMMISSION_RECONCILIATION;
 

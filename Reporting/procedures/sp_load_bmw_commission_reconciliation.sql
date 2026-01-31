@@ -80,6 +80,14 @@ try {
 
     var rows_added = count_after - count_before;
 
+    // Delete rows where CODE does not follow the format D704667 (D followed by 6 digits)
+    var delete_bad_code_sql = `
+        DELETE FROM reporting.details.BMW_COMMISSION_RECONCILIATION
+        WHERE CODE IS NULL OR CODE NOT RLIKE '^D[0-9]{6}$';
+    `;
+    var stmt_delete_bad_code = snowflake.createStatement({sqlText: delete_bad_code_sql});
+    stmt_delete_bad_code.execute();
+
     // Drop staging table
     var drop_command = `DROP TABLE IF EXISTS temp_bmw_commission_reconciliation_staging;`;
     var stmt_drop = snowflake.createStatement({sqlText: drop_command});
