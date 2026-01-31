@@ -9,7 +9,7 @@ $$
 /*
   Loads BMW commission site comm data from stage @reporting.details.REPORTS into reporting.details.bmw_commission_site_comm (all VARCHAR).
   Skips first 1 row of the CSV (header is on row 2).
-  Enhanced for success/error messaging and notification.
+  Enhanced for success/error messaging and notification
 */
 try {
     // Drop temp table if it exists
@@ -58,6 +58,7 @@ try {
     var stmt_copy = snowflake.createStatement({sqlText: copy_command});
     stmt_copy.execute();
 
+
     // Get row count before insert
     var count_before_sql = `SELECT COUNT(*) FROM reporting.details.bmw_commission_site_comm;`;
     var stmt_count_before = snowflake.createStatement({sqlText: count_before_sql});
@@ -71,7 +72,20 @@ try {
                 TRANSACTION_CREATION_DATE_TIME, AGREEMENT_NUMBER, TRANS_TYPE_CODE, TRANS_TYPE_DESC, THIRD_PARTY_ID_CODE, TRADING_NAME, DEBIT_VALUE, CREDIT_VALUE, ADVANCE, CUSTOMER_NAME, REGISTRATION_PLATE, COMPONENT_LIVE_DATE, PRODUCT, CREDIT_PERCENT
             )
             SELECT
-                TRANSACTION_CREATION_DATE_TIME, AGREEMENT_NUMBER, TRANS_TYPE_CODE, TRANS_TYPE_DESC, THIRD_PARTY_ID_CODE, TRADING_NAME, DEBIT_VALUE, CREDIT_VALUE, ADVANCE, CUSTOMER_NAME, REGISTRATION_PLATE, COMPONENT_LIVE_DATE, PRODUCT, CREDIT_PERCENT
+                s.TRANSACTION_CREATION_DATE_TIME,
+                s.AGREEMENT_NUMBER,
+                s.TRANS_TYPE_CODE,
+                s.TRANS_TYPE_DESC,
+                s.THIRD_PARTY_ID_CODE,
+                s.TRADING_NAME,
+                s.DEBIT_VALUE,
+                s.CREDIT_VALUE,
+                s.ADVANCE,
+                s.CUSTOMER_NAME,
+                s.REGISTRATION_PLATE,
+                s.COMPONENT_LIVE_DATE,
+                s.PRODUCT,
+                s.CREDIT_PERCENT
             FROM temp_bmw_commission_site_comm_staging s
             WHERE NOT EXISTS (
                 SELECT 1 FROM reporting.details.bmw_commission_site_comm t 
@@ -89,6 +103,14 @@ try {
     var count_after = rs_after.getColumnValue(1);
 
     var rows_added = count_after - count_before;
+
+    // Delete rows where TRANSACTION_CREATION_DATE_TIME does not look like a date of format 01-Jan-2026
+    var delete_bad_dates_sql = `
+        DELETE FROM reporting.details.bmw_commission_site_comm
+        WHERE TRY_TO_DATE(TRANSACTION_CREATION_DATE_TIME, 'DD-MON-YYYY') IS NULL;
+    `;
+    var stmt_delete_bad_dates = snowflake.createStatement({sqlText: delete_bad_dates_sql});
+    stmt_delete_bad_dates.execute();
 
     // Drop staging table
     var drop_command = `DROP TABLE IF EXISTS temp_bmw_commission_site_comm_staging;`;
