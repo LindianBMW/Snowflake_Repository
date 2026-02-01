@@ -64,8 +64,13 @@ for %%F in ("%DEST_DIR%\sales reports detailed-sales  big dashboard - *.csv") do
     %SNOWSQL% -c %SNOW_CONN% -q "PUT 'file://C:/Temp/%%~nxF' %SNOW_STAGE% AUTO_COMPRESS=false"
 )
 
+REM === STEP 9: Upload the bigmw1_daily report hire car CSV file ===
+set "CSV_FILE_HIRECAR=bigmw1_daily report hire car.csv"
 
-
+if exist "%DEST_DIR%\%CSV_FILE_HIRECAR%" (
+    echo Uploading %CSV_FILE_HIRECAR%...
+    %SNOWSQL% -c %SNOW_CONN% -q "PUT 'file://C:/Temp/%CSV_FILE_HIRECAR%' %SNOW_STAGE% AUTO_COMPRESS=false"
+)
 
 REM === STEP 5: Clear out the destination folder after upload ===
 REM  echo Deleting all files from %DEST_DIR% ...

@@ -1,20 +1,17 @@
-
 use role  accountadmin;
 
-CREATE OR REPLACE PROCEDURE reporting.details.sp_load_bigmw1_daily_report()
+CREATE OR REPLACE PROCEDURE reporting.details.sp_load_bigmw1_daily_report_breakdown()
 RETURNS STRING
 LANGUAGE JAVASCRIPT
 EXECUTE AS CALLER
 AS
 $$
 /*
-  Loads bigmw1_daily report from stage @reporting.details.REPORTS into reporting.details.BIGMW1_DAILY_REPORT (raw VARCHAR).
+  Loads bigmw1_daily report from stage @reporting.details.REPORTS into reporting.details.BIGMW1_DAILY_REPORT_BREAKDOWN (raw VARCHAR).
   Enhanced for success/error messaging and notification. 
-  
-  This is defaulted to the Break Down Claims Report.
-  can you generate a proc and table that is exactly the same, but instead of 
-  BIGMW1_DAILY_REPORT we use BIGMW1_DAILY_REPORT_BREAKDOWN? Keep the pattern the same foe now
-  
+  This is for the Break Down Claims Report (separate from BIGMW1_DAILY_REPORT).
+
+  call reporting.details.sp_load_bigmw1_daily_report_breakdown();
 */
 try {
     // Drop temp table if it exists
@@ -61,7 +58,7 @@ try {
             TYPE = 'CSV',
             SKIP_HEADER = 1,
             FIELD_DELIMITER = ',',
-            FIELD_OPTIONALLY_ENCLOSED_BY = '\"',
+            FIELD_OPTIONALLY_ENCLOSED_BY = '"',
             TRIM_SPACE = FALSE
         )
         ON_ERROR = 'ABORT_STATEMENT';
@@ -69,18 +66,17 @@ try {
     var stmt_copy = snowflake.createStatement({sqlText: copy_command});
     stmt_copy.execute();
 
-
-        // Delete rows with invalid date format from temp table (allow DD-MON-YY and DD MON YYYY)
-        var delete_invalid_date_sql = `
-                DELETE FROM temp_bigmw1_daily_report_staging
-                WHERE TRY_TO_DATE(DATE, 'DD-MON-YY') IS NULL
-                    AND TRY_TO_DATE(DATE, 'DD MON YYYY') IS NULL;
-        `;
-        var stmt_delete_invalid = snowflake.createStatement({sqlText: delete_invalid_date_sql});
-        stmt_delete_invalid.execute();
+    // Delete rows with invalid date format from temp table (allow DD-MON-YY and DD MON YYYY)
+    var delete_invalid_date_sql = `
+            DELETE FROM temp_bigmw1_daily_report_staging
+            WHERE TRY_TO_DATE(DATE, 'DD-MON-YY') IS NULL
+                AND TRY_TO_DATE(DATE, 'DD MON YYYY') IS NULL;
+    `;
+    var stmt_delete_invalid = snowflake.createStatement({sqlText: delete_invalid_date_sql});
+    stmt_delete_invalid.execute();
 
     // Get row count before insert
-    var count_before_sql = `SELECT COUNT(*) FROM reporting.details.BIGMW1_DAILY_REPORT;`;
+    var count_before_sql = `SELECT COUNT(*) FROM reporting.details.BIGMW1_DAILY_REPORT_BREAKDOWN;`;
     var stmt_count_before = snowflake.createStatement({sqlText: count_before_sql});
     var rs_before = stmt_count_before.execute();
     rs_before.next();
@@ -88,7 +84,7 @@ try {
 
     // Insert only new rows into main table (exclude by JOB_NUMBER+VRN)
     var insert_command = `
-            INSERT INTO reporting.details.BIGMW1_DAILY_REPORT (
+            INSERT INTO reporting.details.BIGMW1_DAILY_REPORT_BREAKDOWN (
                 DATE, PARTNER, SUB_ACCOUNT, SCHEME, JOB_NUMBER, VRN, VEHICLE_MAKE, VEHICLE_MODEL, 
                 REPORTED_SYMPTOM, FAULT_DESCRIPTION, FAULT_CAUSE, FAULT_ACTION, RESOURCE_TYPE, 
                 JOB_TYPE_NAME, TOW_DESTINATION, TOW_DISTANCE, SERVICE_BREAKDOWN_COUNT
@@ -104,7 +100,7 @@ try {
                 JOB_TYPE_NAME, TOW_DESTINATION, TOW_DISTANCE, SERVICE_BREAKDOWN_COUNT
             FROM temp_bigmw1_daily_report_staging s
             WHERE NOT EXISTS (
-                SELECT 1 FROM reporting.details.BIGMW1_DAILY_REPORT t 
+                SELECT 1 FROM reporting.details.BIGMW1_DAILY_REPORT_BREAKDOWN t 
                 WHERE t.JOB_NUMBER = s.JOB_NUMBER AND t.VRN = s.VRN
             );
     `;
@@ -112,7 +108,7 @@ try {
     stmt_insert.execute();
 
     // Get row count after insert
-    var count_after_sql = `SELECT COUNT(*) FROM reporting.details.BIGMW1_DAILY_REPORT;`;
+    var count_after_sql = `SELECT COUNT(*) FROM reporting.details.BIGMW1_DAILY_REPORT_BREAKDOWN;`;
     var stmt_count_after = snowflake.createStatement({sqlText: count_after_sql});
     var rs_after = stmt_count_after.execute();
     rs_after.next();
@@ -128,11 +124,11 @@ try {
     // Notify
     var subject, msg, returnMsg;
     if (rows_added > 0) {
-        subject = 'BIGMW1 Daily Report Load: Rows Loaded';
-        msg = `SUCCESS: Loaded ${rows_added} new row(s) into BIGMW1_DAILY_REPORT from @reporting.details.REPORTS.`;
+        subject = 'BIGMW1 Daily Report Breakdown Load: Rows Loaded';
+        msg = `SUCCESS: Loaded ${rows_added} new row(s) into BIGMW1_DAILY_REPORT_BREAKDOWN from @reporting.details.REPORTS.`;
         returnMsg = msg;
     } else {
-        subject = 'BIGMW1 Daily Report Load: No New Rows';
+        subject = 'BIGMW1 Daily Report Breakdown Load: No New Rows';
         msg = 'Load ran successfully: No new rows loaded; data is up to date and no duplicates found.';
         returnMsg = msg;
     }
@@ -155,7 +151,7 @@ try {
         var email_command = `call system$send_email(
             'DATA_ALERTS_EMAIL_INT',
             'Lindian.thomas@bigmotoringworld.co.uk,stuart.saunders@bigmotoringworld.co.uk',
-            'BIGMW1 Daily Report Load Failed',
+            'BIGMW1 Daily Report Breakdown Load Failed',
             'Error message: ${err.message}'
         );`;
         var stmt_email = snowflake.createStatement({sqlText: email_command});
@@ -167,6 +163,6 @@ try {
     } catch (emailErr) {
         // Ignore email error
     }
-    return 'ERROR in sp_load_bigmw1_daily_report: ' + err.message;
+    return 'ERROR in sp_load_bigmw1_daily_report_breakdown: ' + err.message;
 }
 $$;
