@@ -1,3 +1,10 @@
+REM === STEP 10: Upload the B.M.W Commission Statement Reconciliation Comm HO CSV file ===
+set "CSV_FILE_BMW_HO=b.m.w commission statement reconciliation  comm ho.csv"
+
+if exist "%DEST_DIR%\%CSV_FILE_BMW_HO%" (
+    echo Uploading %CSV_FILE_BMW_HO%...
+    %SNOWSQL% -c %SNOW_CONN% -q "PUT 'file://C:/Temp/%CSV_FILE_BMW_HO%' %SNOW_STAGE% AUTO_COMPRESS=false"
+)
 @echo off
 REM === CONFIGURABLE VARIABLES ===
 set "ROBOCOPY_EXE=C:\Windows\System32\robocopy.exe"
