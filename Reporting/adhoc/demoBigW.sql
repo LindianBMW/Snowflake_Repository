@@ -39,7 +39,7 @@ call reporting.details.sp_load_bigmw1_daily_report();
 
 select * from reporting.details.BIGMW1_DAILY_REPORT; --2026-01-26 02:36:45.836
 
-select * from reporting.details.BIGMW1_DAILY_REPORT where customer = 'Lindian'; 
+select * from reporting.details.BIGMW1_DAILY_REPORT;
 
 DELETE FROM reporting.details.BIGMW1_DAILY_REPORT
 WHERE CLAIM_NO IN (

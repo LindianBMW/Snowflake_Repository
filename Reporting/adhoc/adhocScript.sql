@@ -24,3 +24,10 @@ JOIN reporting.details.BIGMW1_DAILY_REPORT big
 LIMIT 10;
 
 
+call reporting.details.sp_load_bigmw1_daily_report_breakdown();
+
+select * from reporting.details.BIGMW1_DAILY_REPORT_BREAKDOWN;
+
+REMOVE @reporting.details.REPORTS;
+
+list @reporting.details.REPORTS;

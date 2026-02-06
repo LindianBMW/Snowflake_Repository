@@ -1,0 +1,191 @@
+
+=====================================================================================
+models/stg_stock_audit_union.sql
+
+{# -- Jinja macro section -- #}
+{% set source_tables = run_query(
+    "SELECT table_name FROM information_schema.tables WHERE table_schema = 'STOCK_AUDIT' AND table_catalog = 'RAW' AND table_name ILIKE 'STOCK_AUDIT_%' ORDER BY table_name DESC"
+).columns[0].values() %}
+
+{# -- Begin output SQL -- #}
+{% for t in source_tables %}
+    SELECT
+        MARGIN_VAT,
+        ASKING_PRICE,
+        INTEREST_RATE,
+        TRANSMISSION,
+        CAP_CLEAN,
+        BUYER,
+        CHASSIS_NUMBER,
+        COST,
+        COLOUR,
+        STOCK_NUMBER,
+        DAYS_IN_STOCK,
+        REGISTRATION,
+        MAKE_MODEL,
+        DATE_REGD,
+        GROSS_COST,
+        CURRENT_SIV,
+        BOUGHT_FROM_GROUP,
+        STATUS,
+        MILEAGE,
+        DAYS_ON_DISPLAY,
+        REAL_DAYS_ON_DISPLAY,
+        VAT_QUALIFYING,
+        AUTO_TRADER_RANK,
+        CHASSIS_PROFIT,
+        RETAIL_VAT,
+        BOUGHT_FROM,
+        FUEL,
+        AUTO_TRADER_RANKING,
+        DATE_IN_STOCK,
+        AUTO_TRADER_PRICE_,
+        RECON,
+        LOCATION,
+        TO_DATE(REGEXP_SUBSTR('{{ t }}', '[0-9]{4}_[0-9]{2}_[0-9]{2}'), 'YYYY_MM_DD') AS DATE
+    FROM RAW.STOCK_AUDIT.{{ t }}
+    {% if not loop.last %}
+    UNION ALL
+    {% endif %}
+{% endfor %}
+
+=====================================================================================
+models/analytics_dna_stock_audit.sql
+      
+{{ config(materialized='incremental', unique_key=['stock_number','date']) }}
+
+SELECT
+    MARGIN_VAT,
+    ASKING_PRICE,
+    INTEREST_RATE,
+    TRANSMISSION,
+    CAP_CLEAN,
+    BUYER,
+    CHASSIS_NUMBER,
+    COST,
+    COLOUR,
+    STOCK_NUMBER,
+    DAYS_IN_STOCK,
+    REGISTRATION,
+    MAKE_MODEL,
+    DATE_REGD,
+    GROSS_COST,
+    CURRENT_SIV,
+    BOUGHT_FROM_GROUP,
+    STATUS,
+    MILEAGE,
+    DAYS_ON_DISPLAY,
+    REAL_DAYS_ON_DISPLAY,
+    VAT_QUALIFYING,
+    AUTO_TRADER_RANK,
+    CHASSIS_PROFIT,
+    RETAIL_VAT,
+    BOUGHT_FROM,
+    FUEL,
+    AUTO_TRADER_RANKING,
+    DATE_IN_STOCK,
+    AUTO_TRADER_PRICE_,
+    RECON,
+    LOCATION,
+    DATE -- this comes from the staging union model
+FROM {{ ref('stg_stock_audit_union') }}
+WHERE date NOT IN (
+  SELECT DISTINCT date FROM {{ this }}
+)
+
+=====================================================================================
+
+sources.yml
+
+version: 2
+
+sources:
+  - name: stock_audit
+    database: RAW
+    schema: STOCK_AUDIT
+    description: >
+      Contains daily snapshot tables for vehicle stock audit (table names: STOCK_AUDIT_YYYY_MM_DD).
+
+--==================================================================================
+
+version: 2
+
+models:
+  - name: stg_stock_audit_union
+    description: >
+      Union of all stock audit snapshot tables from RAW.STOCK_AUDIT.
+    columns:
+      - name: margin_vat
+        description: "Margin VAT"
+      - name: asking_price
+      - name: interest_rate
+      - name: transmission
+      - name: cap_clean
+      - name: buyer
+      - name: chassis_number
+      - name: cost
+      - name: colour
+      - name: stock_number
+      - name: days_in_stock
+      - name: registration
+      - name: make_model
+      - name: date_regd
+      - name: gross_cost
+      - name: current_siv
+      - name: bought_from_group
+      - name: status
+      - name: mileage
+      - name: days_on_display
+      - name: real_days_on_display
+      - name: vat_qualifying
+      - name: auto_trader_rank
+      - name: chassis_profit
+      - name: retail_vat
+      - name: bought_from
+      - name: fuel
+      - name: auto_trader_ranking
+      - name: date_in_stock
+      - name: auto_trader_price_
+      - name: recon
+      - name: location
+      - name: date
+        description: "Snapshot date extracted from source table name"
+
+  - name: analytics_dna_stock_audit
+    description: >
+      The incrementally built table with only unloaded snapshots.
+    columns:
+      - name: margin_vat
+      - name: asking_price
+      - name: interest_rate
+      - name: transmission
+      - name: cap_clean
+      - name: buyer
+      - name: chassis_number
+      - name: cost
+      - name: colour
+      - name: stock_number
+      - name: days_in_stock
+      - name: registration
+      - name: make_model
+      - name: date_regd
+      - name: gross_cost
+      - name: current_siv
+      - name: bought_from_group
+      - name: status
+      - name: mileage
+      - name: days_on_display
+      - name: real_days_on_display
+      - name: vat_qualifying
+      - name: auto_trader_rank
+      - name: chassis_profit
+      - name: retail_vat
+      - name: bought_from
+      - name: fuel
+      - name: auto_trader_ranking
+      - name: date_in_stock
+      - name: auto_trader_price_
+      - name: recon
+      - name: location
+      - name: date
+        description: "Snapshot date"
